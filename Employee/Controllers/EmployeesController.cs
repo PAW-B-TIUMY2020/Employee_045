@@ -44,7 +44,10 @@ namespace Employee.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(employees);
+                if(employees.EmployeeId == 0)
+                    _context.Add(employees);
+                else
+                    _context.Update(employees);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -55,19 +58,10 @@ namespace Employee.Controllers
         // GET: Employees/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var employees = await _context.Employees
-                .FirstOrDefaultAsync(m => m.EmployeeId == id);
-            if (employees == null)
-            {
-                return NotFound();
-            }
-
-            return View(employees);
+            var employee = await _context.Employees.FindAsync(id);
+            _context.Employees.Remove(employee);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
       
